@@ -1,0 +1,302 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>2.1.5.RELEASE</version>
+        <relativePath/> <!-- lookup parent from repository -->
+    </parent>
+    <groupId>com.iba</groupId>
+    <artifactId>TheMCUTI</artifactId>
+    <version>2.0.1.6</version>
+    <packaging>jar</packaging>
+    <name>TheMCUTI</name>
+    <description>TheMCUTI project for software localization management</description>
+
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+        <java.version>1.8</java.version>
+
+        <changelog.markdown.filename>${project.version}.md</changelog.markdown.filename>
+        <changelog.use.content.manager>true</changelog.use.content.manager>
+        <changelog.select.after.commit></changelog.select.after.commit>
+        <changelog.select.after.date></changelog.select.after.date>
+        <changelog.select.after.tag></changelog.select.after.tag>
+        <build.version.increment>true</build.version.increment>
+        <build.database.scripts>true</build.database.scripts>
+    </properties>
+
+    <pluginRepositories>
+        <pluginRepository>
+            <id>local-plugins-repository</id>
+            <url>file://${project.basedir}/.m2/repository</url>
+            <releases>
+                <enabled>true</enabled>
+                <updatePolicy>always</updatePolicy>
+            </releases>
+            <snapshots>
+                <enabled>true</enabled>
+                <updatePolicy>always</updatePolicy>
+            </snapshots>
+        </pluginRepository>
+    </pluginRepositories>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+            </plugin>
+            <plugin>
+                <!--https://danielflower.github.io/maven-gitlog-plugin/usage.html -->
+                <groupId>com.github.danielflower.mavenplugins</groupId>
+                <artifactId>gitlog-maven-plugin</artifactId>
+                <version>1.13.16-SNAPSHOT</version>
+                <configuration>
+                    <!-- base changelog generator configuration settings -->
+                    <reportTitle>TheMCUTI v${project.version} Git Changelog</reportTitle>
+                    <markdownChangeLogFilename>${changelog.markdown.filename}</markdownChangeLogFilename>
+                    <useChangelogContentManager>${changelog.use.content.manager}</useChangelogContentManager>
+                    <changelogRefsRepository>${project.basedir}/changelog/.refs</changelogRefsRepository>
+                    <outputDirectory>${project.basedir}/changelog</outputDirectory>
+                    <generateMarkdownChangeLog>true</generateMarkdownChangeLog>
+                    <markdownChangeLogAppend>false</markdownChangeLogAppend>
+                    <!-- additional changelog content selectors (NOTE: to use them useChangelogContentManager should be false) -->
+                    <includeCommitsAfterCommit>${changelog.select.after.commit}</includeCommitsAfterCommit>
+                    <includeCommitsAfterTag>${changelog.select.after.tag}</includeCommitsAfterTag>
+                    <includeCommitsAfter>${changelog.select.after.date}</includeCommitsAfter>
+                    <!-- switch off generating other types of changelog files -->
+                    <generateSimpleHTMLChangeLog>false</generateSimpleHTMLChangeLog>
+                    <generatePlainTextChangeLog>false</generatePlainTextChangeLog>
+                    <generateJSONChangeLog>false</generateJSONChangeLog>
+                    <!-- changelog formatting configuration settings -->
+                    <excludeCommitsPattern>Build v(\d+\.)(\d+\.)(\d+\.)?(a|b|rc)?(\d+)-?(mysql|mssql|oracle)
+                    </excludeCommitsPattern>
+                    <mergeCommitFilter>true</mergeCommitFilter>
+                    <dateFormat>yyyy-MM-dd HH:mm</dateFormat>
+                    <maxCommitsLimit>1000</maxCommitsLimit>
+                    <showCommiter>true</showCommiter>
+                    <includeTags>false</includeTags>
+                    <verbose>true</verbose>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>com.tconstructor.maven.plugins</groupId>
+                <artifactId>tcbuild-maven-plugin</artifactId>
+                <version>0.0.3-SNAPSHOT</version>
+                <configuration>
+                    <!-- reset-update-sql goal configuration -->
+                    <updateSqlSourceFile>${project.basedir}/database/update.sql</updateSqlSourceFile>
+                    <updateSqlDestinationFile>${project.basedir}/database/${project.version}.sql
+                    </updateSqlDestinationFile>
+                    <updateSqlFileCopyToTarget>true</updateSqlFileCopyToTarget>
+                    <updateSqlFileAppend>true</updateSqlFileAppend>
+                    <!-- setup-version goal configuration -->
+                    <buildVersionPattern>$[major].$[minor].$[maintenance].$[build]</buildVersionPattern>
+                    <buildVersionIncrement>${build.version.increment}</buildVersionIncrement>
+                    <buildVersionIncrementCategory>build</buildVersionIncrementCategory>
+                    <buildVersionFile>version</buildVersionFile>
+                    <!-- build-database goal configuration -->
+                    <buildDatabaseScripts>${build.database.scripts}</buildDatabaseScripts>
+                    <initialDatabaseBackupFile>${project.basedir}/database/init/THEMCUTI.sql</initialDatabaseBackupFile>
+                    <initialDatabaseUpdateFileName>db-themcuti-update.sql</initialDatabaseUpdateFileName>
+                    <updateScriptsFolder>${project.basedir}/database/</updateScriptsFolder>
+                    <includeScriptsRegexp>2.0.*.sql</includeScriptsRegexp>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <source>1.8</source>
+                    <target>1.8</target>
+                </configuration>
+            </plugin>
+        </plugins>
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>true</filtering>
+            </resource>
+        </resources>
+    </build>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-jpa</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-security</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
+
+        <!-- DevTools -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-devtools</artifactId>
+            <optional>true</optional>
+        </dependency>
+
+        <!-- OAuth2 Client -->
+        <dependency>
+            <groupId>org.springframework.security</groupId>
+            <artifactId>spring-security-oauth2-client</artifactId>
+        </dependency>
+
+        <!-- JWT library -->
+        <dependency>
+            <groupId>io.jsonwebtoken</groupId>
+            <artifactId>jjwt</artifactId>
+            <version>0.9.0</version>
+        </dependency>
+
+        <dependency>
+            <groupId>javax.xml.bind</groupId>
+            <artifactId>jaxb-api</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+            <exclusions>
+                <exclusion>
+                    <groupId>junit</groupId>
+                    <artifactId>junit</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-configuration-processor</artifactId>
+            <optional>true</optional>
+        </dependency>
+
+        <!-- Swagger2-->
+        <dependency>
+            <groupId>io.springfox</groupId>
+            <artifactId>springfox-swagger2</artifactId>
+            <version>2.9.2</version>
+        </dependency>
+        <dependency>
+            <groupId>io.springfox</groupId>
+            <artifactId>springfox-swagger-ui</artifactId>
+            <version>2.9.2</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-context-support</artifactId>
+            <version>5.0.9.RELEASE</version>
+        </dependency>
+        <dependency>
+            <groupId>mysql</groupId>
+            <artifactId>mysql-connector-java</artifactId>
+        </dependency>
+        <!-- Gson -->
+        <dependency>
+            <groupId>com.google.code.gson</groupId>
+            <artifactId>gson</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.vaadin.external.google</groupId>
+            <artifactId>android-json</artifactId>
+            <version>0.0.20131108.vaadin1</version>
+        </dependency>
+        <!-- Mail -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-mail</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.googlecode.juniversalchardet</groupId>
+            <artifactId>juniversalchardet</artifactId>
+            <version>1.0.3</version>
+        </dependency>
+        <!-- Log4j -->
+        <dependency>
+            <groupId>log4j</groupId>
+            <artifactId>log4j</artifactId>
+            <version>1.2.17</version>
+        </dependency>
+
+        <!-- JUNIT 5 -->
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter</artifactId>
+            <version>RELEASE</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-engine</artifactId>
+            <version>5.4.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-api</artifactId>
+            <version>5.4.0</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.junit.platform</groupId>
+            <artifactId>junit-platform-commons</artifactId>
+            <version>1.4.1</version>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
+            <version>3.9</version>
+        </dependency>
+
+        <!-- VERSION -->
+        <dependency>
+            <groupId>org.apache.maven</groupId>
+            <artifactId>maven-model</artifactId>
+            <version>3.3.9</version>
+        </dependency>
+
+        <!-- EXCEL -->
+        <dependency>
+            <groupId>org.apache.poi</groupId>
+            <artifactId>poi</artifactId>
+            <version>3.12</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.poi</groupId>
+            <artifactId>poi-ooxml</artifactId>
+            <version>3.12</version>
+        </dependency>
+
+        <!-- HttpClient Apache -->
+        <dependency>
+            <groupId>org.apache.httpcomponents</groupId>
+            <artifactId>httpclient</artifactId>
+            <version>4.5.9</version>
+        </dependency>
+
+        <!-- https://mvnrepository.com/artifact/org.eclipse.mylyn.github/org.eclipse.egit.github.core -->
+        <dependency>
+            <groupId>org.eclipse.mylyn.github</groupId>
+            <artifactId>org.eclipse.egit.github.core</artifactId>
+            <version>2.1.5</version>
+        </dependency>
+
+        <dependency>
+            <groupId>commons-codec</groupId>
+            <artifactId>commons-codec</artifactId>
+            <version>1.10</version>
+        </dependency>
+
+    </dependencies>
+</project>

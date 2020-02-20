@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<metadata>
+  <groupId>com.github.danielflower.mavenplugins</groupId>
+  <artifactId>gitlog-maven-plugin</artifactId>
+  <versioning>
+    <latest>1.13.16-SNAPSHOT</latest>
+    <versions>
+      <version>1.13.16-SNAPSHOT</version>
+    </versions>
+    <lastUpdated>20190110084338</lastUpdated>
+  </versioning>
+</metadata>
